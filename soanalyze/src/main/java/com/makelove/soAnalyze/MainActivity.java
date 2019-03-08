@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity implements PermissionCallBac
         LogUtils.e("+++++++++++++++++++Program Header+++++++++++++++++");
         SoParse.parseProgramHeaderList(fileByteArys);
 
+        LogUtils.e("+++++++++++++++++++Section Header++++++++++++++++++");
+        SoParse.parseSectionHeaderList(fileByteArys);
+
 
 
 
