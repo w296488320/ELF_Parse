@@ -74,17 +74,26 @@ public class MainActivity extends AppCompatActivity implements PermissionCallBac
     }
 
     private void parseSo(byte[] fileByteArys) {
-        //读取头部内容
-        LogUtils.e("+++++++++++++++++++Elf Header+++++++++++++++++");
-        SoParse.parseHeader(fileByteArys, 0);
 
 
-        //读取Program Header
-        LogUtils.e("+++++++++++++++++++Program Header+++++++++++++++++");
-        SoParse.parseProgramHeaderList(fileByteArys);
 
-        LogUtils.e("+++++++++++++++++++Section Header++++++++++++++++++");
-        SoParse.parseSectionHeaderList(fileByteArys);
+
+
+//        //读取头部内容
+//        LogUtils.e("+++++++++++++++++++Elf Header+++++++++++++++++");
+//        SoParse.parseHeader(fileByteArys, 0);
+//
+//
+//        //读取Program Header
+//        LogUtils.e("+++++++++++++++++++Program Header+++++++++++++++++");
+//        SoParse.parseProgramHeaderList(fileByteArys);
+//
+//        LogUtils.e("+++++++++++++++++++Section Header++++++++++++++++++");
+//        SoParse.parseSectionHeaderList(fileByteArys);
+
+
+
+
 
 
 

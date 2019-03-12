@@ -1,11 +1,23 @@
 package com.makelove.soAnalyze;
 
 import com.makelove.soAnalyze.bean.ElfType32;
+//    ELF头部(ELF_Header): 每个ELF文件都必须存在一个ELF_Header,
+//    这里存放了很多重要的信息用来描述整个文件的组织,如: 版本信息,入口信息,
+//    偏移信息等。程序执行也必须依靠其提供的信息。
 
-/**
- * Created by lyh on 2018/11/7.
- */
+//    程序头部表(Program_Header_Table): 可选的一个表，用于告诉系统如何在内存中创建映像,在图中也可以看出来,
+//    有程序头部表才有段,有段就必须有程序头部表。其中存放各个段的基本信息(包括地址指针)。
 
+//    节区头部表(Section_Header_Table): 类似与Program_Header_Table,但与其相对应的是节区(Section)。
+
+//    节区(Section): 将文件分成一个个节区，每个节区都有其对应的功能，如符号表，哈希表等。
+
+//    段(Segment): 嗯…就是将文件分成一段一段映射到内存中。段中通常包括一个或多个节区
+
+//        动态符号表 (.dynsym) 用来保存与动态链接相关的导入导出符号
+//        不包括模块内部的符号。而 .symtab 则保存所有符号，包括 .dynsym 中的符号。
+//
+//        动态符号表中所包含的符号的符号名保存在动态符号字符串表 .dynstr 中。
 public class SoParse {
 
 
@@ -65,13 +77,42 @@ public class SoParse {
         int header_size = 40;//40个字节
         int header_count = Utils.byte2Short(type_32.hdr.e_shnumCount);//头部的个数
         byte[] des = new byte[header_size];
+
         for (int i = 0; i < header_count; i++) {
             System.arraycopy(header, i * header_size + offset, des, 0, header_size);
 
-            //type_32.shdrList.add(parseSectionHeader(des));
+            type_32.SectionHeaderList.add(parseSectionHeader(des));
         }
     }
 
+
+    /**
+     *  public byte[] sh_name = new byte[4];
+     public byte[] sh_type = new byte[4];
+     public byte[] sh_flags = new byte[4];
+     public byte[] sh_addr = new byte[4];
+     public byte[] sh_offset = new byte[4];
+     public byte[] sh_size = new byte[4];
+     public byte[] sh_link = new byte[4];
+     public byte[] sh_info = new byte[4];
+     public byte[] sh_addralign = new byte[4];
+     public byte[] sh_entsize = new byte[4];
+     */
+    private static ElfType32.Elf32_SectionHeaderItem parseSectionHeader(byte[] header) {
+        ElfType32.Elf32_SectionHeaderItem shdr = new ElfType32.Elf32_SectionHeaderItem();
+
+        shdr.sh_name = Utils.copyBytes(header, 0, 4);
+        shdr.sh_type = Utils.copyBytes(header, 4, 4);
+        shdr.sh_flags = Utils.copyBytes(header, 8, 4);
+        shdr.sh_addr = Utils.copyBytes(header, 12, 4);
+        shdr.sh_offset = Utils.copyBytes(header, 16, 4);
+        shdr.sh_size = Utils.copyBytes(header, 20, 4);
+        shdr.sh_link = Utils.copyBytes(header, 24, 4);
+        shdr.sh_info = Utils.copyBytes(header, 28, 4);
+        shdr.sh_addralign = Utils.copyBytes(header, 32, 4);
+        shdr.sh_entsize = Utils.copyBytes(header, 36, 4);
+        return shdr;
+    }
 
     /**
      * 解析程序头信息
@@ -97,7 +138,6 @@ public class SoParse {
         }
     }
 
-
     private static ElfType32.Elf32_ProgramHeeaderItem parseProgramHeader(byte[] header) {
         /**
          public int p_type;
@@ -121,6 +161,8 @@ public class SoParse {
         return phdr;
 
     }
+
+
 
 
 }
