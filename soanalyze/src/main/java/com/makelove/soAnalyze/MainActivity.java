@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements PermissionCallBac
                     SoProcessing();
                 }else {
                     //没有全部拿到
-//                    ToastUtils.showToast(this,getString(R.string.asdfasd));
+//                    ToastUtils.showToast(this,getSectionString(R.string.asdfasd));
 //                    System.exit(0);
                 }
                 //初始化推送

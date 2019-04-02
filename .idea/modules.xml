@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/helloword/helloword.iml" filepath="$PROJECT_DIR$/helloword/helloword.iml" />
       <module fileurl="file://$PROJECT_DIR$/soStudy.iml" filepath="$PROJECT_DIR$/soStudy.iml" />
       <module fileurl="file://$PROJECT_DIR$/soanalyze/soanalyze.iml" filepath="$PROJECT_DIR$/soanalyze/soanalyze.iml" />
+      <module fileurl="file://$PROJECT_DIR$/soanalyzeforc++/soanalyzeforc++.iml" filepath="$PROJECT_DIR$/soanalyzeforc++/soanalyzeforc++.iml" />
     </modules>
   </component>
 </project>

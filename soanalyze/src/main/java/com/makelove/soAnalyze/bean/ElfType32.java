@@ -551,6 +551,9 @@ public class ElfType32 {
 
         /**
          * 节区头部表格中与节区名称字符串表相关的表项索引
+         * 记录 section表 表本身的 函数名字 在 section的 index
+         * 比如 27  意思是 Section里面的 表名 比如 .text .data
+         * 这些数据 在 Section表的 27 位置
          * <p>
          * String Table Index,在节区表中有一个存储各节区名称的节区
          * (通常是最后一个),这里表示名称表在第几个节区。

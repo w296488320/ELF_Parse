@@ -39,7 +39,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void *reserved) {
     jclass jclazz = env->FindClass("com/makelove/so/MainActivity");
 
     JNINativeMethod natives[] = {
-            {"getString", "()Ljava/lang/String;", (void*)getString}
+            {"getSectionString", "()Ljava/lang/String;", (void*)getString}
 
     };
     env->RegisterNatives(jclazz, natives,1);

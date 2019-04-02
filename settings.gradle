@@ -1,1 +1,1 @@
-include ':helloword', ':soanalyze'
+include ':helloword', ':soanalyze', ':soanalyzeforc++'
