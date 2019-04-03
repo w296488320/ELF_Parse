@@ -39,7 +39,8 @@ int section_str_size = 0;
 char *symstr;
 
 //这个是保存 全部 section表名字的 char *
-char  * SectionTabStr;
+char *SectionTabStr;
+
 
 void prepare(char *path);
 
@@ -55,9 +56,6 @@ void Test();
 
 void initStringList(FILE *pFILE);
 
-char *getSectionString(Elf32_Word name);
-
-void fenge(char *str,char* SectionList[]);
 
 void Main() {
     LOGE("Native Main被执行 ");
@@ -118,7 +116,7 @@ void prepare(char *path) {
 
         initStringList(fdr);
 
-       // analyzeProgram(fdr);
+        analyzeProgram(fdr);
 
         analyzeSection(fdr);
     } else {
@@ -132,22 +130,6 @@ void prepare(char *path) {
     LOGE("执行完毕");
 }
 
-
-
-
-//list<Elf32_Sym *> DynsymList;
-
-//list<Elf32_Sym *> DynstrList;
-
-//Elf32_Sym *Section_str_array;
-
-
-//主要是 通过 解析 ELF文件的符号表 dynsym进行 赋值
-
-
-
-//兼容 c++
-//extern "C"
 void initStringList(FILE *pFILE) {
 
     LOGE("开始 解析 StringList");
@@ -159,6 +141,7 @@ void initStringList(FILE *pFILE) {
         long i = ftell(pFILE);
         LOGE("StringList fseek成功 file当前位置 %d", i);
     }
+
     //首先遍历 section 集合 主要是 获取 dynsym 表
     // 和 dynstr表的 开始 位置和大小
     for (int i = 0; i < elf_head.e_shnum; i++) {
@@ -178,75 +161,12 @@ void initStringList(FILE *pFILE) {
         }
 
         if (SItem.sh_type == SHT_STRTAB) {
-            // 如果是节名字符串表直接跳过
             // section表的 位置 判断 因为 shstrtab
             // （保存 section表的 名称的 表 ）表
             // 的类型也是 SHT_STRTAB
             if (i == elf_head.e_shstrndx) {
-                LOGE("进来了");
                 section_str_off = SItem.sh_offset;
                 section_str_size = SItem.sh_size;
-
-
-
-                //这个地方 需要 加 +1 因为在 010 可以得知 第一个 是 00
-                if (fseek(pFILE, section_str_off + 1, SEEK_SET) != 0) {
-                    LOGE("文件移动到 Section 表名字指针 失败 ");
-                    fclose(pFILE);
-                    return;
-                } else {
-                    LOGE("文件移动到 Section 表名字指针 成功 ");
-                }
-
-//                LOGE("当前 file偏移位置 %ld", ftell(pFILE));
-//
-//                LOGE("要分配的大小 %d", section_str_size);
-//
-                SectionTabStr = (char  *) malloc((size_t) (section_str_size + 1));
-//
-//                //LOGE("SectionTabStr 大小 %d", sizeof(*SectionTabStr));
-//
-                size_t str_size = fread(SectionTabStr, (size_t) section_str_size, 1, pFILE);
-
-
-
-//                LOGE("888888888888  %s",SectionTabStr);
-//
-//                LOGE("888888888888  %s",SectionTabStr+10);
-
-               // LOGE("888888888888  %s",SectionTabStr[1]);
-
-
-
-                char *SectionList[elf_head.e_shnum];
-
-                int count=0;
-                for(int p=0;p<elf_head.e_shnum;p++) {
-                    if (p == 0) {
-                        SectionList[p] = SectionTabStr;
-                    } else{
-                        SectionList[p]=SectionTabStr+count;
-                    }
-                    LOGE("字符串 %s ",SectionList+count);
-                    //LOGE("字符串 位置 %s"，&(*SectionList[p]));
-                    count=count+strlen(SectionList[p]);
-
-                }
-
-
-                if (str_size != 0) {
-
-                } else {
-                    LOGE("字符串表 失败  ");
-                    fclose(pFILE);
-                    return;
-                }
-                if (SectionTabStr == NULL || strlen(SectionTabStr) == 0) {
-                    LOGE("SectionTabStr   NULL ");
-                    fclose(pFILE);
-                    return;
-                }
-                LOGE("执行完毕");
                 continue;
             }
             dynsym_str_off = SItem.sh_offset;
@@ -300,34 +220,44 @@ void initStringList(FILE *pFILE) {
         //elf32_sym_array 本身是个 地址 需要先拿到
         // 对应的内容 在拿到 数据里面的信息 所以是 二级指针
         s_name = &(symstr[elf32_sym_array->st_name]);
-
         //将 当前 符号表的 内容打印出来
-        LOGE(" dynsym表 遍历  位置 %d  数据详情 %s", y, s_name);
+        //LOGE(" dynsym表 遍历  位置 %d  数据详情 %s", y, s_name);
     }
 }
-
-void fenge(char *str,char* SectionList[]) {
-    char * fen= (char *) "\0";
-    char *p;
-//    while ((p=strtok(str,fen))){
-//        SectionList[]
-//    }
-
-    LOGE("分割 666 %s",strtok(str,fen));
-    for(int i=0;i<elf_head.e_shnum;i++){
-        LOGE("分割 %s",strtok(NULL,fen));
-        SectionList[i]=strtok(NULL,fen);
-    }
-}
-
 
 void analyzeSection(FILE *pFILE) {
+    //先初始化
+    //存放 每个 字符串地址的 数组 主要 存放 sectionList里面的内容
+    //char *SectionList[elf_head.e_shnum];
 
+    //这个地方 需要 加 +1 因为在 010 可以得知 第一个 是 00
+    if (fseek(pFILE, section_str_off + 1, SEEK_SET) != 0) {
+        LOGE("文件移动到 Section 表名字指针 失败 ");
+        fclose(pFILE);
+        return;
+    } else {
+        LOGE("文件移动到 Section 表名字指针 成功 ");
+    }
+    SectionTabStr = (char *) malloc((size_t) (section_str_size + 1));
+
+    size_t str_size = fread(SectionTabStr, (size_t) section_str_size, 1, pFILE);
+
+//    int count = 0;
+//    for (int p = 0; p < elf_head.e_shnum; p++) {
+//        char *str;
+//        if (p == 0) {
+//            str = SectionTabStr;
+//        } else {
+//            str = SectionTabStr + count;
+//        }
+//        //这个地方 必须 加 1 如果 不加1 第一位就是 /0
+//        count = count + strlen(str) + 1;
+//        SectionList[p] = str;
+//        LOGE("字符串内容 %s  长度 %d  位置 %d", str, strlen(str), count);
+//    }
 
     LOGE("开始 解析 Section");
     // 文件指针移动到程序头 偏移
-    LOGE("偏移位置  %d", elf_head.e_shoff);
-
     if (fseek(pFILE, (long) elf_head.e_shoff, SEEK_SET) != 0) {
         LOGE("移动到节头 失败");
         fclose(pFILE);
@@ -336,12 +266,8 @@ void analyzeSection(FILE *pFILE) {
         LOGE("fseek成功 file当前位置 %d", i);
     }
 
-
-    LOGE("Section字段 Item的 个数 %d  节头偏移开始位置 %d", elf_head.e_shnum, elf_head.e_shoff);
     for (int i = 0; i < elf_head.e_shnum; i++) {
-
         Elf32_Shdr *SItem = new Elf32_Shdr();
-
         size_t PItem_size = fread(SItem, 1, sizeof(Elf32_Shdr), pFILE);
         if (PItem_size != 0) {
             LOGE("Section Item 匹配成功 总个数%d  当前的 Item %d", elf_head.e_phnum, i);
@@ -349,19 +275,10 @@ void analyzeSection(FILE *pFILE) {
             LOGE("Section Item  错误原因%d", PItem_size);
             return;
         }
-
         if (SItem->sh_name == NULL) {
             LOGE("Section Item  Section 名字 SHT_UNDEF");
         } else {
-
-            LOGE("在 SectionTabStr 的 总长度%d   sizeof %d", strlen(SectionTabStr),
-                 sizeof(SectionTabStr));
-            LOGE("在 SectionTabStr 的 内容   %s", SectionTabStr);
-
-
-            LOGE("在 SectionTabStr 的 位置 %d", SItem->sh_name);
-
-            LOGE("Section Item  Section 名字 %s", (char *) (SectionTabStr[SItem->sh_name]));
+            LOGE("Section Item  Section 名字 %s", SectionTabStr+SItem->sh_name);
         }
         LOGE("Section Item  Section 节区类型 %d", SItem->sh_type);
         LOGE("Section Item  Section 节区标志 %d", SItem->sh_flags);
@@ -372,15 +289,8 @@ void analyzeSection(FILE *pFILE) {
         LOGE("Section Item  Section 附加信息  如果 sh_link 为 0 sh_info也为 0 %d", SItem->sh_info);
         LOGE("Section Item  Section 对齐约束   %d", SItem->sh_addralign);
         LOGE("Section Item  Section 节区表项大小   %d", SItem->sh_entsize);
-
-
     }
 
-}
-
-//位置
-char *getSectionString(Elf32_Word name) {
-    return (char *) SectionTabStr[name];
 }
 
 
